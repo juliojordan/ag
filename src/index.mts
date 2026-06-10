@@ -1,6 +1,6 @@
 import * as readline from "node:readline";
 
-import Anthropic from "@anthropic-ai/sdk";
+import Anthropic, { type ParsedMessage } from "@anthropic-ai/sdk";
 
 import { runTool, tools, webSearchTool } from "./tools.mjs";
 
@@ -18,10 +18,17 @@ When you complete a task, say so clearly and briefly.
 
 Do not use emojis in your responses.`;
 
+const MODEL = "claude-sonnet-4-6";
+
 const contextWindow: Anthropic.MessageParam[] = [];
 
 async function main() {
   while (true) {
+    const maxContextWindowTokens = await getMaxContextWindowTokens(
+      client,
+      MODEL,
+    );
+
     const prompt = await getPrompt();
 
     if (prompt === ".exit") {
@@ -48,7 +55,7 @@ async function main() {
       contextWindow.push({ role: "assistant", content: response.content });
 
       if (response.stop_reason === "end_turn") {
-        process.stdout.write(`\n`);
+        getTokenUsage(response, maxContextWindowTokens);
         break;
       }
 
@@ -87,4 +94,29 @@ function getToolUses(
   content: Anthropic.Messages.ContentBlock[],
 ): Anthropic.Messages.ToolUseBlock[] {
   return content.filter((contentBlock) => contentBlock.type === "tool_use");
+}
+
+function getTokenUsage(
+  response: ParsedMessage<null>,
+  maxContextWindowTokens: number,
+) {
+  const tokenCount = countTokens(response.usage);
+  process.stdout.write(
+    `\n ${tokenCount} / ${maxContextWindowTokens} (${Math.round((tokenCount / maxContextWindowTokens) * 100)}%)\n`,
+  );
+}
+
+async function getMaxContextWindowTokens(
+  client: Anthropic,
+  model: string,
+): Promise<number> {
+  const DEFAULT_CONTEXT_WINDOW_TOKENS = 1_000_000;
+  const { max_input_tokens } = await client.models.retrieve(model);
+  const contextWindowTokens = max_input_tokens ?? DEFAULT_CONTEXT_WINDOW_TOKENS;
+  return contextWindowTokens;
+}
+
+function countTokens(usage: Anthropic.Messages.Usage): number {
+  const { input_tokens, output_tokens } = usage;
+  return input_tokens + output_tokens;
 }
