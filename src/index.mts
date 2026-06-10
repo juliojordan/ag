@@ -3,6 +3,8 @@ import * as readline from "node:readline";
 import Anthropic, { type ParsedMessage } from "@anthropic-ai/sdk";
 
 import { runTool, tools, webSearchTool } from "./tools.mjs";
+import { getSkills } from "./skills.mjs";
+import { getSystemPrompt } from "./utils.mjs";
 
 const client = new Anthropic();
 const rl = readline.createInterface({
@@ -43,7 +45,7 @@ async function main() {
           model: "claude-sonnet-4-6",
           max_tokens: 64000,
           tools: [...tools, webSearchTool],
-          system: SYSTEM_PROMPT,
+          system: getSystemPrompt() + "\n\n" + (await getSkills()),
           messages: contextWindow,
         })
         .on("text", (text) => {
