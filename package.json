@@ -1,0 +1,38 @@
+{
+  "name": "ag",
+  "version": "1.0.0",
+  "description": "A person or thing that acts",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.mts",
+    "dev:read-only": "tsx src/index.mts --read-only",
+    "dev:tokenmaxxing": "tsx src/index.mts --tokenmaxxing",
+    "dev:trust-me-bro": "tsx src/index.mts --trust-me-bro",
+    "lint": "tsc --noEmit",
+    "start": "node dist/index.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juliojordan/ag.git"
+  },
+  "keywords": [],
+  "author": "Julio Jordan",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/juliojordan/ag/issues"
+  },
+  "homepage": "https://github.com/juliojordan/ag#readme",
+  "devDependencies": {
+    "@types/node": "^25.9.2",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1"
+  },
+  "bin": {
+    "ag": "dist/index.mjs"
+  }
+}
