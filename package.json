@@ -32,7 +32,5 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1"
   },
-  "bin": {
-    "ag": "dist/index.mjs"
-  }
+  "bin": "./dist/index.mjs"
 }
